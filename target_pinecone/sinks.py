@@ -27,7 +27,7 @@ class PineconeSink(BatchSink):
             pinecone.create_index(
                 name=index_name,
                 metric='cosine',
-                dimension=1536  # 1536 dim of text-embedding-ada-002
+                dimension=self.config["dimensions"]
             )
         self.index = pinecone.Index(index_name)
 

@@ -61,6 +61,14 @@ class TargetPinecone(Target):
             default="text",
             required=True,
         ),
+        th.Property(
+            "dimensions",
+            th.IntegerType,
+            description="The amount of dimensions to use if creating a new index. "
+                "An index is only created if it doesn't already exist. "
+                "The default is `1536` which is the dimensions of the embeddings using OpenAI's text-embedding-ada-002 model.",
+            default=1536,
+        ),
     ).to_dict()
 
     default_sink_class = PineconeSink
