@@ -1,6 +1,6 @@
 # `target-pinecone`
 
-Singer target for Pinecone.
+Singer target for [Pinecone](https://www.pinecone.io/).
 
 Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
