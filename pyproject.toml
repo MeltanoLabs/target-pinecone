@@ -9,6 +9,9 @@ keywords = [
     "Pinecone",
 ]
 license = "ELv2"
+packages = [
+    { include = "target_pinecone" }
+]
 
 [tool.poetry.dependencies]
 python = "<3.12,>=3.8"
