@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "target-pinecone"
-version = "0.0.1"
+name = "meltanolabs-target-pinecone"
+version = "0.0.0"
 description = "`target-pinecone` is a Singer target for Pinecone, built with the Meltano Singer SDK."
 readme = "README.md"
 authors = ["Pat Nadolny"]
@@ -8,13 +8,14 @@ keywords = [
     "ELT",
     "Pinecone",
 ]
-license = "Apache-2.0"
+license = "ELv2"
 
 [tool.poetry.dependencies]
-python = "<3.12,>=3.7.1"
+python = "<3.12,>=3.8"
 singer-sdk = { version="^0.30.0" }
 fs-s3fs = { version = "^1.1.1", optional = true }
 requests = "^2.31.0"
+pinecone-client = "^2.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"
@@ -42,9 +43,14 @@ known-first-party = ["target_pinecone"]
 convention = "google"
 
 [build-system]
-requires = ["poetry-core>=1.0.8"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.8", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry.scripts]
 # CLI declaration
 target-pinecone = 'target_pinecone.target:TargetPinecone.cli'
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"

@@ -11,26 +11,55 @@ from target_pinecone.sinks import (
 
 
 class TargetPinecone(Target):
-    """Sample target for Pinecone."""
+    """Singer target for Pinecone."""
 
     name = "target-pinecone"
 
     config_jsonschema = th.PropertiesList(
         th.Property(
-            "filepath",
+            "api_key",
             th.StringType,
-            description="The path to the target output file",
+            required=True,
+            secret=True,
+            description="Your Pinecone API key.",
         ),
         th.Property(
-            "file_naming_scheme",
+            "index_name",
             th.StringType,
-            description="The scheme with which output files will be named",
+            required=True,
+            description="Your Pinecone index name to write data to.",
         ),
         th.Property(
-            "auth_token",
+            "environment",
             th.StringType,
-            secret=True,  # Flag config as protected.
-            description="The path to the target output file",
+            description="Your Pinecone index name to write data to.",
+            examples=["us-west1-gcp"],
+        ),
+        th.Property(
+            "document_text_property",
+            th.StringType,
+            description="The property containing the document text in the input records.",
+            default="text",
+            required=True,
+        ),
+        th.Property(
+            "embeddings_property",
+            th.StringType,
+            description="The property containing the embeddings in the input records.",
+            default="embeddings",
+        ),
+        th.Property(
+            "metadata_property",
+            th.StringType,
+            description="The property containing the document metadata in the input records.",
+            default="metadata",
+        ),
+        th.Property(
+            "pinecone_metadata_text_key",
+            th.StringType,
+            description="The key in the Pinecone metadata entry that will contain the text document.",
+            default="text",
+            required=True,
         ),
     ).to_dict()
 

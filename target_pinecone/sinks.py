@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+
+import pinecone
 from singer_sdk.sinks import BatchSink
 
 
@@ -10,34 +13,59 @@ class PineconeSink(BatchSink):
 
     max_size = 100  # Max records to write in one batch
 
-    def start_batch(self, context: dict) -> None:
-        """Start a batch.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        Developers may optionally add additional markers to the `context` dict,
-        which is unique to this batch.
+        index_name = self.config["index_name"]
+        pinecone.init(
+            api_key=self.config["api_key"],
+            environment=self.config["environment"],
+        )
 
-        Args:
-            context: Stream partition or context dictionary.
-        """
-        # Sample:
-        # ------
-        # batch_key = context["batch_id"]
-        # context["file_path"] = f"{batch_key}.csv"
+        if index_name not in pinecone.list_indexes():
+            # we create a new index
+            pinecone.create_index(
+                name=index_name,
+                metric='cosine',
+                dimension=1536  # 1536 dim of text-embedding-ada-002
+            )
+        self.index = pinecone.Index(index_name)
+
+    @property
+    def document_text_property(self) -> str:
+        return self.config["document_text_property"]
+
+    @property
+    def metadata_property(self) -> str:
+        return self.config["metadata_property"]
+
+    @property
+    def embeddings_property(self) -> str:
+        return self.config["embeddings_property"]
+
+    @property
+    def pinecone_metadata_text_key(self) -> str:
+        return self.config["pinecone_metadata_text_key"]
 
     def process_record(self, record: dict, context: dict) -> None:
-        """Process the record.
+        if "records" not in context:
+            context["records"] = []
 
-        Developers may optionally read or write additional markers within the
-        passed `context` dict from the current batch.
+        text = record[self.document_text_property]
+        embedding = [float(deci) for deci in record[self.embeddings_property]]
+        metadata = record[self.metadata_property]
+        metadata[self.pinecone_metadata_text_key] = text
+        # calculate an md5 hash of the document text
+        if not self.key_properties:
+            id = hashlib.md5(
+                record[self.document_text_property].encode("utf-8")
+            ).hexdigest()
+        else:
+            id = ":".join([record[key] for key in self.key_properties])
 
-        Args:
-            record: Individual record in the stream.
-            context: Stream partition or context dictionary.
-        """
-        # Sample:
-        # ------
-        # with open(context["file_path"], "a") as csvfile:
-        #     csvfile.write(record)
+        context["records"].append(
+            (id, embedding, metadata)
+        )
 
     def process_batch(self, context: dict) -> None:
         """Write out any prepped records and return once fully written.
@@ -45,8 +73,6 @@ class PineconeSink(BatchSink):
         Args:
             context: Stream partition or context dictionary.
         """
-        
-        # Sample:
-        # ------
-        # client.upload(context["file_path"])  # Upload file
-        # Path(context["file_path"]).unlink()  # Delete local copy
+        self.index.upsert(
+            vectors=context["records"],
+        )

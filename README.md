@@ -1,61 +1,39 @@
-# target-pinecone
+# `target-pinecone`
 
-`target-pinecone` is a Singer target for Pinecone.
+Singer target for Pinecone.
 
-Build with the [Meltano Target SDK](https://sdk.meltano.com).
+Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
-<!--
+## Capabilities
 
-Developer TODO: Update the below as needed to correctly describe the install procedure. For instance, if you do not have a PyPi repo, or if you want users to directly install from your git repo, you can modify this step as appropriate.
+* `about`
+* `stream-maps`
+* `schema-flattening`
 
-## Installation
+## Settings
 
-Install from PyPi:
+| Setting                   | Required | Default | Description |
+|:--------------------------|:--------:|:-------:|:------------|
+| api_key                   | True     | None    | Your Pinecone API key. |
+| index_name                | True     | None    | Your Pinecone index name to write data to. |
+| environment               | False    | None    | Your Pinecone index name to write data to. |
+| document_text_property    | True     | text    | The property containing the document text in the input records. |
+| embeddings_property       | False    | embeddings | The property containing the embeddings in the input records. |
+| metadata_property         | False    | metadata | The property containing the document metadata in the input records. |
+| pinecone_metadata_text_key| True     | text    | The key in the Pinecone metadata entry that will contain the text document. |
+| stream_maps               | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
+| stream_map_config         | False    | None    | User-defined config values to be used within map expressions. |
+| flattening_enabled        | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth      | False    | None    | The max depth to flatten schemas. |
 
-```bash
-pipx install target-pinecone
-```
+A full list of supported settings and capabilities is available by running: `target-pinecone --about`
 
-Install from GitHub:
+## Supported Python Versions
 
-```bash
-pipx install git+https://github.com/ORG_NAME/target-pinecone.git@main
-```
-
--->
-
-## Configuration
-
-### Accepted Config Options
-
-<!--
-Developer TODO: Provide a list of config options accepted by the target.
-
-This section can be created by copy-pasting the CLI output from:
-
-```
-target-pinecone --about --format=markdown
-```
--->
-
-A full list of supported settings and capabilities for this
-target is available by running:
-
-```bash
-target-pinecone --about
-```
-
-### Configure using environment variables
-
-This Singer target will automatically import any environment variables within the working directory's
-`.env` if the `--config=ENV` is provided, such that config values will be considered if a matching
-environment variable is set either in the terminal context or in the `.env` file.
-
-### Source Authentication and Authorization
-
-<!--
-Developer TODO: If your target requires special access on the destination system, or any special authentication requirements, provide those here.
--->
+* 3.8
+* 3.9
+* 3.10
+* 3.11
 
 ## Usage
 
@@ -63,11 +41,13 @@ You can easily run `target-pinecone` by itself or in a pipeline using [Meltano](
 
 ### Executing the Target Directly
 
+This target expects the input data to already have embeddings pre-processed so you will either need to extract from a source containing embeddings or use something like the [map-gpt-embeddings](https://github.com/MeltanoLabs/map-gpt-embeddings) mapper to generate embeddings on the fly.
+
 ```bash
 target-pinecone --version
 target-pinecone --help
 # Test using the "Carbon Intensity" sample:
-tap-carbon-intensity | target-pinecone --config /path/to/target-pinecone-config.json
+cat embeddings.singer | target-pinecone --config /path/to/target-pinecone-config.json
 ```
 
 ## Developer Resources
@@ -101,12 +81,6 @@ poetry run target-pinecone --help
 _**Note:** This target will work in any Singer environment and does not require Meltano.
 Examples here are for convenience and to streamline end-to-end orchestration scenarios._
 
-<!--
-Developer TODO:
-Your project comes with a custom `meltano.yml` project file already created. Open the `meltano.yml` and follow any "TODO" items listed in
-the file.
--->
-
 Next, install Meltano (if you haven't already) and any needed plugins:
 
 ```bash
@@ -122,8 +96,8 @@ Now you can test and orchestrate using Meltano:
 ```bash
 # Test invocation:
 meltano invoke target-pinecone --version
-# OR run a test `elt` pipeline with the Carbon Intensity sample tap:
-meltano run tap-carbon-intensity target-pinecone
+# OR run a test `elt` pipeline with the Carbon Intensity sample tap and map-gpt-embeddings:
+meltano run tap-carbon-intensity map-gpt-embeddings target-pinecone
 ```
 
 ### SDK Dev Guide
