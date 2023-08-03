@@ -22,6 +22,8 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 | metadata_property         | False    | metadata | The property containing the document metadata in the input records. |
 | pinecone_metadata_text_key| True     | text    | The key in the Pinecone metadata entry that will contain the text document. |
 | dimensions                | False    |    1536 | The amount of dimensions to use if creating a new index. An index is only created if it doesn't already exist. The default is `1536` which is the dimensions of the embeddings using OpenAI's text-embedding-ada-002 model. |
+| add_record_metadata       | False    | None    | Add metadata to records. |
+| load_method               | False    | append-only | The method to use when loading data into the destination. `append-only` will always write all input records whether that records already exists or not. `upsert` will update existing records and insert new records. `overwrite` will delete all existing records and insert all input records. |
 | stream_maps               | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
 | stream_map_config         | False    | None    | User-defined config values to be used within map expressions. |
 | flattening_enabled        | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |

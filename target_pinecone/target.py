@@ -11,7 +11,7 @@ from target_pinecone.sinks import (
 
 
 class TargetPinecone(Target):
-    """Singer target for Pinecone."""
+    """Singer target for [Pinecone](https://www.pinecone.io/)."""
 
     name = "target-pinecone"
 
