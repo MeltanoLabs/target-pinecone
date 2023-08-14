@@ -1,5 +1,7 @@
-import pinecone
 import time
+
+import pinecone
+
 
 class PineconeWrapper:
 
@@ -25,8 +27,9 @@ class PineconeWrapper:
         pinecone.Index(index_name).upsert(vectors=vectors)
 
     def recreate_index(self, index_name):
-        index_spec = pinecone.Index(index_name).describe_index_stats()
+        index_spec = pinecone.describe_index(index_name)
         pinecone.delete_index(index_name)
+        self.logger.info(f"Creating index `{index_name}`, this could take several minutes...")
         pinecone.create_index(
             name=index_name,
             dimension=int(index_spec.dimension),
@@ -40,9 +43,10 @@ class PineconeWrapper:
             # Wait a max of 10 minutes to create index, it should never take this long
             timeout=600,
         )
-        self.wait_until_index_ready()
+        self._wait_until_index_ready(index_name)
 
     def create_index(self, index_name, dimensions):
+        self.logger.info(f"Creating index `{index_name}`, this could take several minutes...")
         pinecone.create_index(
             name=index_name,
             metric='cosine',
@@ -50,7 +54,7 @@ class PineconeWrapper:
             # Wait a max of 10 minutes to create index, it should never take this long
             timeout=600,
         )
-        self._wait_until_index_ready()
+        self._wait_until_index_ready(index_name)
 
     def index_has_vectors(self, index_name):
         index = pinecone.Index(index_name)

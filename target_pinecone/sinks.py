@@ -27,7 +27,6 @@ class PineconeSink(BatchSink):
                 else:
                     self.logger.info(f"The load_method is {TargetLoadMethods.OVERWRITE} but the index is empty, not re-creating.")
         else:
-            self.logger.info(f"Creating index `{index_name}`, this could take several minutes...")
             self.client.create_index(
                 index_name,
                 self.config["dimensions"]
